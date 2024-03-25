@@ -15,6 +15,7 @@ class VerifyUserRepository @Inject constructor(
     val messageSendCode = MutableStateFlow("")
     val loadingSendCode = MutableStateFlow(false)
     val resultSendCode = MutableStateFlow(false)
+    val isError =MutableStateFlow(false)
 
 
     val messageVerifyCode = MutableStateFlow("")
@@ -36,7 +37,9 @@ class VerifyUserRepository @Inject constructor(
                 messageSendCode.emit(responce.body()!!.message)
                 resultSendCode.emit(true)
             } else {
-                messageSendCode.emit(responce.body()!!.message)
+                isError.emit(true)
+                loadingSendCode.emit(false)
+                messageSendCode.emit("ایمیل نا درست است")
             }
         }
     }
@@ -58,6 +61,10 @@ class VerifyUserRepository @Inject constructor(
                 loadingVerifyCode.emit(false)
                 messageVerifyCode.emit(responce.body()!!.message)
                 resultVerify.emit(true)
+            }
+            else{
+                loadingVerifyCode.emit(false)
+
             }
         }
     }

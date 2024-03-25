@@ -20,6 +20,7 @@ class VerifyApiUserViewModel @Inject constructor(
     val messageSendCode = repository.messageSendCode
     val loadingSendCode = repository.loadingSendCode
     val resultSendCode = repository.resultSendCode
+    val isErrorSenCode =repository.isError
 
     val messageVerifyCode = repository.messageVerifyCode
     val loadingVerifyCode = repository.loadingVerifyCode
