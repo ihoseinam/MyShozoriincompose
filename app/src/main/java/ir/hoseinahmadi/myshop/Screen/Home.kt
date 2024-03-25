@@ -37,8 +37,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Center
+import androidx.compose.ui.Alignment.Companion.TopCenter
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -51,11 +54,30 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import ir.hoseinahmadi.myshop.Navigation.Screen
 import ir.hoseinahmadi.myshop.Remote.Data.ProductItem
+import ir.hoseinahmadi.myshop.ViewModel.DataStoreViewModel
 import ir.hoseinahmadi.myshop.ViewModel.MainApiViewModel
+import ir.hoseinahmadi.myshop.component.Loading3Dots
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @Composable
-fun HomeScreen(navHostController: NavHostController) {
+fun HomeScreen(
+    navHostController: NavHostController,
+    viewModel: MainApiViewModel = hiltViewModel(),
+) {
+    var loadin by remember {
+        mutableStateOf(true)
+    }
+    val scop = rememberCoroutineScope()
+    LaunchedEffect(loadin) {
+        launch {
+            scop.launch {
+                viewModel.loading.collectLatest {
+                    loadin = it
+                }
+            }
+        }
+    }
     Scaffold(
         topBar = {
             Row(
@@ -63,16 +85,26 @@ fun HomeScreen(navHostController: NavHostController) {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                IconButton(onClick = { navHostController.navigate(Screen.Login.route) }) {
-                Icon(Icons.Rounded.AccountCircle, contentDescription = "")
+                IconButton(onClick = { navHostController.navigate(Screen.Profile.route) }) {
+                    Icon(Icons.Rounded.AccountCircle, contentDescription = "")
                 }
             }
         }
     ) {
-        Column(
-            modifier = Modifier.padding(it)
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(it),
+            contentAlignment = TopCenter
         ) {
-            Category(navHostController)
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = TopCenter) {
+                Category(navHostController)
+            }
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Center) {
+                if (loadin) {
+                    Loading3Dots(isDark = true)
+                }
+            }
         }
     }
 
@@ -88,10 +120,11 @@ fun Category(navHostController: NavHostController) {
             mutableIntStateOf(0)
         }
         val item = listOf(
-            "electronics",
-            "jewelery",
-            "men's",
-            "women's",
+            "All",
+            "Electronics",
+            "Jewelery",
+            "Men's",
+            "Women's",
         )
         Row {
             item.forEachIndexed { index, item ->
@@ -139,10 +172,11 @@ fun Category(navHostController: NavHostController) {
 
 
         when (selectedIndex) {
-            0 -> Electronics(navHostController)
-            1 -> Jewelery(navHostController)
-            2 -> Mens(navHostController)
-            3 -> Womens(navHostController)
+            0 -> AllItem(navHostController)
+            1 -> Electronics(navHostController)
+            2 -> Jewelery(navHostController)
+            3 -> Mens(navHostController)
+            4 -> Womens(navHostController)
         }
     }
 }
@@ -196,7 +230,28 @@ fun ItemProduct(navHostController: NavHostController, data: ProductItem) {
 }
 
 @Composable
-fun Electronics(navHostController: NavHostController,viewModel: MainApiViewModel = hiltViewModel(),) {
+fun AllItem(navHostController: NavHostController, viewModel: MainApiViewModel = hiltViewModel()) {
+    var item by remember {
+        mutableStateOf(emptyList<ProductItem>())
+    }
+    LaunchedEffect(true) {
+        viewModel.getAllItem()
+        viewModel.allItem.collectLatest {
+            item = it
+        }
+    }
+    LazyVerticalGrid(columns = GridCells.Fixed(2)) {
+        itemsIndexed(item) { index, item ->
+            ItemProduct(navHostController, data = item)
+        }
+    }
+}
+
+@Composable
+fun Electronics(
+    navHostController: NavHostController,
+    viewModel: MainApiViewModel = hiltViewModel(),
+) {
     var item by remember {
         mutableStateOf(emptyList<ProductItem>())
     }
@@ -208,14 +263,14 @@ fun Electronics(navHostController: NavHostController,viewModel: MainApiViewModel
     }
     LazyVerticalGrid(columns = GridCells.Fixed(2)) {
         itemsIndexed(item) { index, item ->
-            ItemProduct(navHostController,data = item)
+            ItemProduct(navHostController, data = item)
         }
     }
 }
 
 
 @Composable
-fun Jewelery(navHostController: NavHostController,viewModel: MainApiViewModel = hiltViewModel()) {
+fun Jewelery(navHostController: NavHostController, viewModel: MainApiViewModel = hiltViewModel()) {
     var item by remember {
         mutableStateOf(emptyList<ProductItem>())
     }
@@ -228,13 +283,13 @@ fun Jewelery(navHostController: NavHostController,viewModel: MainApiViewModel = 
 
     LazyVerticalGrid(columns = GridCells.Fixed(2)) {
         itemsIndexed(item) { index, item ->
-            ItemProduct(navHostController,data = item)
+            ItemProduct(navHostController, data = item)
         }
     }
 }
 
 @Composable
-fun Mens(navHostController: NavHostController,viewModel: MainApiViewModel = hiltViewModel()) {
+fun Mens(navHostController: NavHostController, viewModel: MainApiViewModel = hiltViewModel()) {
     var item by remember {
         mutableStateOf(emptyList<ProductItem>())
     }
@@ -247,13 +302,13 @@ fun Mens(navHostController: NavHostController,viewModel: MainApiViewModel = hilt
 
     LazyVerticalGrid(columns = GridCells.Fixed(2)) {
         itemsIndexed(item) { index, item ->
-            ItemProduct(navHostController,data = item)
+            ItemProduct(navHostController, data = item)
         }
     }
 }
 
 @Composable
-fun Womens(navHostController: NavHostController,viewModel: MainApiViewModel = hiltViewModel(),) {
+fun Womens(navHostController: NavHostController, viewModel: MainApiViewModel = hiltViewModel()) {
     var item by remember {
         mutableStateOf(emptyList<ProductItem>())
     }
@@ -266,7 +321,7 @@ fun Womens(navHostController: NavHostController,viewModel: MainApiViewModel = hi
 
     LazyVerticalGrid(columns = GridCells.Fixed(2)) {
         itemsIndexed(item) { index, item ->
-            ItemProduct(navHostController,data = item)
+            ItemProduct(navHostController, data = item)
         }
     }
 }

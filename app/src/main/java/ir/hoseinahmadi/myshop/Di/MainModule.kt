@@ -5,7 +5,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import ir.hoseinahmadi.myshop.Remote.Main.ApiInterFace
-import ir.hoseinahmadi.myshop.Remote.Constants.BUSE_URL
+import ir.hoseinahmadi.myshop.component.Constants.BUSE_URL
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton

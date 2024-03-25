@@ -33,9 +33,9 @@ class VerifyUserRepository @Inject constructor(
         }
         withContext(Dispatchers.Main) {
             if (responce.isSuccessful) {
+                resultSendCode.emit(true)
                 loadingSendCode.emit(false)
                 messageSendCode.emit(responce.body()!!.message)
-                resultSendCode.emit(true)
             } else {
                 isError.emit(true)
                 loadingSendCode.emit(false)

@@ -7,5 +7,6 @@ sealed class Screen(
     object Home:Screen("Home")
     object Login:Screen("login_screen")
     object InfoItem:Screen("info_screen")
+    object Profile:Screen("Profile_Screen")
 
 }

@@ -13,6 +13,7 @@ import androidx.navigation.navArgument
 import ir.hoseinahmadi.myshop.Screen.HomeScreen
 import ir.hoseinahmadi.myshop.Screen.InfoItem
 import ir.hoseinahmadi.myshop.Screen.LoginScreen
+import ir.hoseinahmadi.myshop.Screen.ProfileScreen
 import ir.hoseinahmadi.myshop.Screen.SplashScreen
 
 @Composable
@@ -41,6 +42,9 @@ fun NavGraph(navHostController: NavHostController) {
                 navHostController = navHostController,
                 id = it.arguments?.getString("id", "0")
             )
+        }
+        composable(Screen.Profile.route){
+            ProfileScreen(navHostController = navHostController)
         }
     }
 }

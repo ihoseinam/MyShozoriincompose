@@ -17,29 +17,51 @@ class MainApiRepository @Inject constructor(
     val getJeweleryCategory = MutableStateFlow<List<ProductItem>>(emptyList())
     val getMensCategory = MutableStateFlow<List<ProductItem>>(emptyList())
     val getWomanCategory = MutableStateFlow<List<ProductItem>>(emptyList())
+    val loading = MutableStateFlow(true)
+    val allItem =MutableStateFlow<List<ProductItem>>(emptyList())
+
     val emty = ProductItem(
         "", "", 0, "", 0.0, Rating(0, 0.0),
         ""
     )
     val productById = MutableStateFlow<ProductItem>(emty)
 
-    suspend fun getCategoryItem() = api.getCategory()
-
-    suspend fun getAllProduct() = api.getAllProduct()
+    suspend fun getAllProduct() {
+        loading.emit(true)
+        val responce =try {
+            api.getAllProduct()
+        }catch (e:Exception){
+            return
+        }
+        withContext(Dispatchers.Main){
+            if (responce.isSuccessful){
+                responce.body()?.let {
+                    allItem.emit(it)
+                }
+                loading.emit(false)
+            }
+        }
+    }
 
     suspend fun getProductById(id: String) {
+        loading.emit(true)
         val responce =try {
             api.getProductById(id)
         }catch (e:Exception){
             return
         }
-        if (responce.isSuccessful){
-            productById.emit(responce.body()!!)
+        withContext(Dispatchers.Main){
+            if (responce.isSuccessful){
+                productById.emit(responce.body()!!)
+                loading.emit(false)
+            }
         }
+
     }
 
 
     suspend fun getElectronicsCategory() {
+        loading.emit(true)
         val response = try {
             api.getElectronicsCategory()
         } catch (e: Exception) {
@@ -48,11 +70,14 @@ class MainApiRepository @Inject constructor(
         withContext(Dispatchers.Main) {
             if (response.isSuccessful) {
                 getElectronicsCategory.emit(response.body()!!)
+                loading.emit(false)
+
             }
         }
     }
 
     suspend fun getJeweleryCategory() {
+        loading.emit(true)
         val response = try {
             api.getJeweleryCategory()
         } catch (e: Exception) {
@@ -61,11 +86,14 @@ class MainApiRepository @Inject constructor(
         withContext(Dispatchers.Main) {
             if (response.isSuccessful) {
                 getJeweleryCategory.emit(response.body()!!)
+                loading.emit(false)
+
             }
         }
     }
 
     suspend fun getMensCategory() {
+        loading.emit(true)
         val response = try {
             api.getMensCategory()
         } catch (e: Exception) {
@@ -74,11 +102,13 @@ class MainApiRepository @Inject constructor(
         withContext(Dispatchers.Main) {
             if (response.isSuccessful) {
                 getMensCategory.emit(response.body()!!)
+                loading.emit(false)
             }
         }
     }
 
     suspend fun getWomanCategory() {
+        loading.emit(true)
         val response = try {
             api.getWomanCategory()
         } catch (e: Exception) {
@@ -87,6 +117,7 @@ class MainApiRepository @Inject constructor(
         withContext(Dispatchers.Main) {
             if (response.isSuccessful) {
                 getWomanCategory.emit(response.body()!!)
+                loading.emit(false)
             }
         }
     }

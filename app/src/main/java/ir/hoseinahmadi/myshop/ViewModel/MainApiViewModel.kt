@@ -8,6 +8,7 @@ import ir.hoseinahmadi.myshop.Remote.Data.ProductItem
 import ir.hoseinahmadi.myshop.Repository.MainApiRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -24,11 +25,18 @@ class MainApiViewModel @Inject constructor(
     val getWomanCategory = repository.getWomanCategory
 
     val productById = repository.productById
+    val loading = repository.loading
+    val allItem =repository.allItem
 
-    suspend fun getProductById(id: String) {
-    viewModelScope.launch(Dispatchers.IO) {
-        repository.getProductById(id)
+    suspend fun getAllItem(){
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.getAllProduct()
+        }
     }
+    suspend fun getProductById(id: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.getProductById(id)
+        }
     }
 
     suspend fun getElectronicsCategory() {
