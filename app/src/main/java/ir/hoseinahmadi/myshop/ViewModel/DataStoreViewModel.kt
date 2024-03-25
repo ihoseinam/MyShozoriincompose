@@ -1,12 +1,17 @@
 package ir.hoseinahmadi.myshop.ViewModel
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import ir.hoseinahmadi.datastore.datastore.DataStoreRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -14,15 +19,21 @@ class DataStoreViewModel @Inject constructor(
     private val repository: DataStoreRepository
 ) : ViewModel() {
     companion object {
-        const val UserPhoneKey = "UserPhoneKey"
         const val nameKey = "user_name"
         const val emailKey = "emailKey"
         const val checkLogin = "check_user_login"
         const val UserPas = "UserPas"
     }
 
+
+    val stateName = mutableStateOf("")
+    val getName = MutableStateFlow("")
+    val getEmail =MutableStateFlow("")
+    val getLoginInfo =MutableStateFlow(false)
+    val getPassword =MutableStateFlow("")
+
     fun saveName(name: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch() {
             repository.putString(nameKey, name)
         }
     }
@@ -45,22 +56,47 @@ class DataStoreViewModel @Inject constructor(
         }
     }
 
-    suspend fun getName(): String = repository.getString(nameKey) ?: ""
-    suspend fun getEmail(): String = repository.getString(emailKey) ?: ""
-    suspend fun getLoginInfo(): Boolean = repository.getBoolean(checkLogin) ?: false
-    suspend fun getPassword():String =repository.getString(UserPas)?:""
-
-
-    val userPhone = MutableStateFlow("")
-    fun getUserPhone() {
+    suspend fun getName(){
         viewModelScope.launch(Dispatchers.IO) {
-            repository.getString(UserPhoneKey)?.let {
-                userPhone.emit(it)
+            repository.getString(nameKey)?.let {
+                withContext(Dispatchers.Main){
+                    stateName.value =it
+                    getName.emit(it)
+                }
             }
         }
     }
 
-    suspend fun getUserPhone2(): String? = repository.getString(UserPhoneKey)
+    suspend fun getEmail(){
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.getString(emailKey)?.let {
+                withContext(Dispatchers.Main){
+                    getEmail.emit(it)
+                }
+            }
+        }
+    }
+    suspend fun getLoginInfo(){
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.getBoolean(checkLogin)?.let {
+                withContext(Dispatchers.Main){
+                    getLoginInfo.emit(it)
+                }
+            }
+        }
+    }
+    suspend fun getPassword(){
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.getString(UserPas)?.let {
+                withContext(Dispatchers.Main){
+                    getPassword.emit(it)
+                }
+            }
+        }
+    }
+
+
+
 
 
 }

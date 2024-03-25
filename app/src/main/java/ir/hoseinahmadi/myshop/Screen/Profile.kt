@@ -10,6 +10,7 @@ import androidx.compose.runtime.setValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import ir.hoseinahmadi.myshop.ViewModel.DataStoreViewModel
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @Composable
@@ -23,8 +24,9 @@ fun ProfileScreen(
     }
         LaunchedEffect(true) {
         launch {
-            viewModel2.getLoginInfo().let {
-                checkLogin=it
+           viewModel2.getLoginInfo()
+            viewModel2.getLoginInfo.collectLatest {
+                checkLogin =it
             }
         }
     }

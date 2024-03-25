@@ -1,7 +1,7 @@
 package ir.hoseinahmadi.myshop.Screen
 
+import android.util.Log
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Create
 import androidx.compose.material.icons.rounded.KeyboardArrowRight
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -24,12 +23,12 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,6 +47,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import ir.hoseinahmadi.myshop.R
 import ir.hoseinahmadi.myshop.ViewModel.DataStoreViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @Composable
@@ -56,8 +57,9 @@ fun MyProfileScreen(navHostController: NavHostController) {
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        InfoAccount()
         Account()
+        InfoAccount()
+
 
 
 //        for (item in 0..2) {
@@ -115,8 +117,6 @@ fun ProfileItem(onclick: () -> Unit, text: String, icon: ImageVector) {
 
 var showDialog = mutableStateOf(false)
 
-var name by mutableStateOf("")
-var isemail by mutableStateOf("")
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -133,60 +133,66 @@ fun InfoAccount(viewModel: DataStoreViewModel = hiltViewModel()) {
     var isError by remember {
         mutableStateOf(false)
     }
-    var myName = remember {
-        name
-    }
     var save by remember {
         mutableStateOf(false)
     }
-
+    var name by remember {
+        mutableStateOf("")
+    }
+    var email by remember {
+        mutableStateOf("")
+    }
 
     val scope = rememberCoroutineScope()
+
     LaunchedEffect(save) {
         if (save) {
             launch {
-                scope.launch {
-                    viewModel.saveName(name)
-                }
+                viewModel.saveName(name)
             }
             launch {
-                scope.launch {
-                    viewModel.savePassword(pasword)
-                }
-                save = false
+                viewModel.savePassword(pasword)
             }
         }
+
     }
     LaunchedEffect(save) {
         launch {
             scope.launch {
-                viewModel.getEmail().let {
-                    isemail = it
+                viewModel.getEmail()
+                viewModel.getEmail.collectLatest {
+                    email = it
                 }
             }
         }
         launch {
             scope.launch {
-                viewModel.getPassword().let {
+                viewModel.getPassword()
+                viewModel.getPassword.collectLatest {
                     pasword = it
+                }
+            }
+        }
+        launch {
+            scope.launch {
+                viewModel.getPassword()
+                viewModel.getPassword.collectLatest {
                     pasword2 = it
                 }
             }
         }
         launch {
             scope.launch {
-                viewModel.getName().let {
-                    myName = it
+                viewModel.getName()
+                viewModel.getName.collectLatest {
+                    name = it
                 }
             }
         }
     }
     if (show) {
         ModalBottomSheet(
-            onDismissRequest = {
-                showDialog.value = false
-                save = false
-            })
+            onDismissRequest = { showDialog.value = false })
         {
             Box(
                 modifier = Modifier
@@ -203,7 +209,7 @@ fun InfoAccount(viewModel: DataStoreViewModel = hiltViewModel()) {
                     ) {
                         OutlinedTextField(
                             modifier = Modifier.fillMaxWidth(),
-                            value = isemail,
+                            value = email,
                             onValueChange = { },
                             readOnly = true,
                             label = {
@@ -255,32 +261,58 @@ fun InfoAccount(viewModel: DataStoreViewModel = hiltViewModel()) {
                                 isError = pasword != pasword2
                                 if (!isError) {
                                     save = true
+                                    refresh.value=true
                                     showDialog.value = false
                                 }
-                                save = false
                             },
                             shape = RoundedCornerShape(9.dp)
                         ) {
                             Text(text = "save")
                         }
-
                     }
 
                 }
 
             }
         }
+        save = false
+        refresh.value=false
     }
-
-
 }
 
+
+var refresh = mutableStateOf(false)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Account() {
+fun Account(viewModel: DataStoreViewModel = hiltViewModel()) {
+    var name by remember {
+        mutableStateOf("")
+    }
+    var email by remember {
+        mutableStateOf("بدون ایمیل ")
+    }
+
+    LaunchedEffect(true) {
+        launch {
+            viewModel.getName()
+            viewModel.getName.collect {
+                name = it
+                Log.e("pasi",it)
+            }
+        }
+        launch {
+            viewModel.getEmail()
+            viewModel.getEmail.collectLatest {
+                email = it
+            }
+        }
+    }
+
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        onClick = { showDialog.value =true},
+        onClick = {
+            showDialog.value = true
+        },
         modifier = Modifier
             .fillMaxWidth(),
         shape = RoundedCornerShape(0.5.dp)
@@ -297,7 +329,8 @@ fun Account() {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start
             ) {
-                Image(painter = painterResource(id = R.drawable.avatar), contentDescription = "",
+                Image(
+                    painter = painterResource(id = R.drawable.avatar), contentDescription = "",
                     Modifier
                         .size(90.dp)
                         .clip(CircleShape)
@@ -306,14 +339,13 @@ fun Account() {
                 Column(
                 ) {
                     Text(text = name)
-                    Text(text = isemail,
-                        fontSize = 9.sp
-                        )
+                    Text(text = email, fontSize = 10.sp)
                 }
             }
-                Icon(Icons.Rounded.KeyboardArrowRight,
-                    contentDescription = "")
-
+            Icon(
+                Icons.Rounded.KeyboardArrowRight,
+                contentDescription = ""
+            )
 
         }
     }
