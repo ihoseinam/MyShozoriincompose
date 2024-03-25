@@ -5,4 +5,7 @@ sealed class Screen(
 ) {
     object SplashScreen :Screen("splash")
     object Home:Screen("Home")
+    object Login:Screen("login_screen")
+    object InfoItem:Screen("info_screen")
+
 }

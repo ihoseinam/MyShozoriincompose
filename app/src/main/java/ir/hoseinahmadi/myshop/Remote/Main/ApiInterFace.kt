@@ -1,4 +1,4 @@
-package ir.hoseinahmadi.myshop.Remote
+package ir.hoseinahmadi.myshop.Remote.Main
 
 import ir.hoseinahmadi.myshop.Remote.Data.CategoryData
 import ir.hoseinahmadi.myshop.Remote.Data.ProductItem

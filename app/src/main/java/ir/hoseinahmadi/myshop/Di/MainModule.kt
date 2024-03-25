@@ -4,12 +4,10 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import ir.hoseinahmadi.myshop.Remote.ApiInterFace
-import ir.hoseinahmadi.myshop.Remote.Constants
+import ir.hoseinahmadi.myshop.Remote.Main.ApiInterFace
 import ir.hoseinahmadi.myshop.Remote.Constants.BUSE_URL
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.create
 import javax.inject.Singleton
 
 @Module

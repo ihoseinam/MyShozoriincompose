@@ -1,8 +1,11 @@
 package ir.hoseinahmadi.myshop.Screen
 
+import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,13 +16,21 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.AccountCircle
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -35,22 +46,41 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import ir.hoseinahmadi.myshop.Navigation.Screen
 import ir.hoseinahmadi.myshop.Remote.Data.ProductItem
 import ir.hoseinahmadi.myshop.ViewModel.MainApiViewModel
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun HomeScreen(navHostController: NavHostController) {
-    Column {
-        Category()
+    Scaffold(
+        topBar = {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                IconButton(onClick = { navHostController.navigate(Screen.Login.route) }) {
+                Icon(Icons.Rounded.AccountCircle, contentDescription = "")
+                }
+            }
+        }
+    ) {
+        Column(
+            modifier = Modifier.padding(it)
+        ) {
+            Category(navHostController)
+        }
     }
+
 
 }
 
 @Composable
-fun Category() {
+fun Category(navHostController: NavHostController) {
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -63,14 +93,30 @@ fun Category() {
             "men's",
             "women's",
         )
-        TabRow(
-            modifier = Modifier.padding(start = 6.dp).fillMaxWidth(0.9f),
-            selectedTabIndex = selectedIndex,
-            indicator = {},
-            divider = {}
-        ) {
+        Row {
             item.forEachIndexed { index, item ->
-                Tab(
+                TextButton(
+                    onClick = { selectedIndex = index },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (selectedIndex == index)
+                            Color(0xFFFF9800)
+                        else
+                            Color.White
+                    )
+                ) {
+                    Text(
+                        text = item,
+                        color = if (selectedIndex == index)
+                            Color.White
+                        else
+                            Color.DarkGray
+
+                    )
+                }
+            }
+
+            /*    Tab(
                     modifier = Modifier
                         .padding(3.dp)
                         .clip(CircleShape)
@@ -88,15 +134,15 @@ fun Category() {
                             fontSize = 9.sp
                         )
                     }
-                )
-            }
+                )*/
         }
 
+
         when (selectedIndex) {
-            0 -> Electronics()
-            1 -> Jewelery()
-            2 -> Mens()
-            3 -> Womens()
+            0 -> Electronics(navHostController)
+            1 -> Jewelery(navHostController)
+            2 -> Mens(navHostController)
+            3 -> Womens(navHostController)
         }
     }
 }
@@ -104,10 +150,12 @@ fun Category() {
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
 @Composable
-fun ItemProduct(data: ProductItem) {
+fun ItemProduct(navHostController: NavHostController, data: ProductItem) {
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        onClick = { /*TODO*/ },
+        onClick = {
+            navHostController.navigate(Screen.InfoItem.route + "?id=${data.id}")
+        },
         elevation = CardDefaults.cardElevation(12.dp),
         modifier = Modifier
             .padding(6.dp)
@@ -148,7 +196,7 @@ fun ItemProduct(data: ProductItem) {
 }
 
 @Composable
-fun Electronics(viewModel: MainApiViewModel = hiltViewModel()) {
+fun Electronics(navHostController: NavHostController,viewModel: MainApiViewModel = hiltViewModel(),) {
     var item by remember {
         mutableStateOf(emptyList<ProductItem>())
     }
@@ -158,17 +206,16 @@ fun Electronics(viewModel: MainApiViewModel = hiltViewModel()) {
             item = it
         }
     }
-
     LazyVerticalGrid(columns = GridCells.Fixed(2)) {
         itemsIndexed(item) { index, item ->
-            ItemProduct(data = item)
+            ItemProduct(navHostController,data = item)
         }
     }
 }
 
 
 @Composable
-fun Jewelery(viewModel: MainApiViewModel = hiltViewModel()) {
+fun Jewelery(navHostController: NavHostController,viewModel: MainApiViewModel = hiltViewModel()) {
     var item by remember {
         mutableStateOf(emptyList<ProductItem>())
     }
@@ -181,13 +228,13 @@ fun Jewelery(viewModel: MainApiViewModel = hiltViewModel()) {
 
     LazyVerticalGrid(columns = GridCells.Fixed(2)) {
         itemsIndexed(item) { index, item ->
-            ItemProduct(data = item)
+            ItemProduct(navHostController,data = item)
         }
     }
 }
 
 @Composable
-fun Mens(viewModel: MainApiViewModel = hiltViewModel()) {
+fun Mens(navHostController: NavHostController,viewModel: MainApiViewModel = hiltViewModel()) {
     var item by remember {
         mutableStateOf(emptyList<ProductItem>())
     }
@@ -200,13 +247,13 @@ fun Mens(viewModel: MainApiViewModel = hiltViewModel()) {
 
     LazyVerticalGrid(columns = GridCells.Fixed(2)) {
         itemsIndexed(item) { index, item ->
-            ItemProduct(data = item)
+            ItemProduct(navHostController,data = item)
         }
     }
 }
 
 @Composable
-fun Womens(viewModel: MainApiViewModel = hiltViewModel()) {
+fun Womens(navHostController: NavHostController,viewModel: MainApiViewModel = hiltViewModel(),) {
     var item by remember {
         mutableStateOf(emptyList<ProductItem>())
     }
@@ -219,7 +266,7 @@ fun Womens(viewModel: MainApiViewModel = hiltViewModel()) {
 
     LazyVerticalGrid(columns = GridCells.Fixed(2)) {
         itemsIndexed(item) { index, item ->
-            ItemProduct(data = item)
+            ItemProduct(navHostController,data = item)
         }
     }
 }

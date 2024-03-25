@@ -6,9 +6,13 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import ir.hoseinahmadi.myshop.Screen.HomeScreen
+import ir.hoseinahmadi.myshop.Screen.InfoItem
+import ir.hoseinahmadi.myshop.Screen.LoginScreen
 import ir.hoseinahmadi.myshop.Screen.SplashScreen
 
 @Composable
@@ -22,6 +26,21 @@ fun NavGraph(navHostController: NavHostController) {
         }
         composable(Screen.Home.route) {
             HomeScreen(navHostController = navHostController)
+        }
+        composable(Screen.Login.route) {
+            LoginScreen(navHostController)
+        }
+        composable(Screen.InfoItem.route + "?id={id}",
+            arguments = listOf(
+                navArgument("id"){
+                    type = NavType.StringType
+                }
+            )
+            ) {
+            InfoItem(
+                navHostController = navHostController,
+                id = it.arguments?.getString("id", "0")
+            )
         }
     }
 }
