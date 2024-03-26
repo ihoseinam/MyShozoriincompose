@@ -8,5 +8,7 @@ sealed class Screen(
     object Login:Screen("login_screen")
     object InfoItem:Screen("info_screen")
     object Profile:Screen("Profile_Screen")
+    object ShopingCard:Screen("ShopingCard")
+    object Fav:Screen("fave_screen")
 
 }

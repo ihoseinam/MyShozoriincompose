@@ -10,10 +10,12 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import ir.hoseinahmadi.myshop.Screen.FaveScreen
 import ir.hoseinahmadi.myshop.Screen.HomeScreen
 import ir.hoseinahmadi.myshop.Screen.InfoItem
 import ir.hoseinahmadi.myshop.Screen.LoginScreen
 import ir.hoseinahmadi.myshop.Screen.ProfileScreen
+import ir.hoseinahmadi.myshop.Screen.ShopingScreen
 import ir.hoseinahmadi.myshop.Screen.SplashScreen
 
 @Composable
@@ -45,6 +47,12 @@ fun NavGraph(navHostController: NavHostController) {
         }
         composable(Screen.Profile.route){
             ProfileScreen(navHostController = navHostController)
+        }
+        composable(Screen.Fav.route){
+            FaveScreen(navHostController = navHostController)
+        }
+        composable(Screen.ShopingCard.route){
+            ShopingScreen(navHostController = navHostController)
         }
     }
 }

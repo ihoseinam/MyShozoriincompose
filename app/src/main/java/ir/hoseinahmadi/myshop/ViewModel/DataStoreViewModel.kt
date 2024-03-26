@@ -1,16 +1,12 @@
 package ir.hoseinahmadi.myshop.ViewModel
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import ir.hoseinahmadi.datastore.datastore.DataStoreRepository
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -26,11 +22,11 @@ class DataStoreViewModel @Inject constructor(
     }
 
 
-    val stateName = mutableStateOf("")
     val getName = MutableStateFlow("")
     val getEmail =MutableStateFlow("")
     val getLoginInfo =MutableStateFlow(false)
     val getPassword =MutableStateFlow("")
+
 
     fun saveName(name: String) {
         viewModelScope.launch() {
@@ -56,11 +52,10 @@ class DataStoreViewModel @Inject constructor(
         }
     }
 
-    suspend fun getName(){
+     fun getName(){
         viewModelScope.launch(Dispatchers.IO) {
             repository.getString(nameKey)?.let {
                 withContext(Dispatchers.Main){
-                    stateName.value =it
                     getName.emit(it)
                 }
             }

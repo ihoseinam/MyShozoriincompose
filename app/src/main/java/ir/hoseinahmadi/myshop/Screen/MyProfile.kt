@@ -15,17 +15,30 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.outlined.Build
+import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Build
+import androidx.compose.material.icons.rounded.Email
+import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.rounded.KeyboardArrowRight
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -41,6 +54,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -51,22 +66,31 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyProfileScreen(navHostController: NavHostController) {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
+    Scaffold(
+        topBar = {
+            TopAppBar(title = { /*TODO*/ }, navigationIcon = {
+                IconButton(onClick = { navHostController.popBackStack() }) {
+                    Icon(Icons.Rounded.ArrowBack, contentDescription ="" )
+                }
+            })
+        }
     ) {
-        Account()
-        InfoAccount()
+        Column(
+            modifier = Modifier.fillMaxSize().padding(it),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Account()
+            InfoAccount(navHostController)
+            ProfileItem(onclick = { /*TODO*/ }, text ="My favorites list" , icon = Icons.Rounded.FavoriteBorder)
+            ProfileItem(onclick = { /*TODO*/ }, text = "Update check", icon = Icons.Outlined.Build)
+            ProfileItem(onclick = { /*TODO*/ }, text ="Message to support" , icon = Icons.Outlined.Email)
 
-
-
-//        for (item in 0..2) {
-//            ProfileItem(onclick = { }, text = "loli", icon = Icons.Rounded.Email)
-//        }
-
+        }
     }
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -120,7 +144,10 @@ var showDialog = mutableStateOf(false)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InfoAccount(viewModel: DataStoreViewModel = hiltViewModel()) {
+fun InfoAccount(
+    navHostController: NavHostController,
+    viewModel: DataStoreViewModel = hiltViewModel()
+) {
     val show by remember {
         showDialog
     }
@@ -129,12 +156,6 @@ fun InfoAccount(viewModel: DataStoreViewModel = hiltViewModel()) {
     }
     var pasword2 by remember {
         mutableStateOf("")
-    }
-    var isError by remember {
-        mutableStateOf(false)
-    }
-    var save by remember {
-        mutableStateOf(false)
     }
     var name by remember {
         mutableStateOf("")
@@ -145,18 +166,7 @@ fun InfoAccount(viewModel: DataStoreViewModel = hiltViewModel()) {
 
     val scope = rememberCoroutineScope()
 
-    LaunchedEffect(save) {
-        if (save) {
-            launch {
-                viewModel.saveName(name)
-            }
-            launch {
-                viewModel.savePassword(pasword)
-            }
-        }
-
-    }
-    LaunchedEffect(save) {
+    LaunchedEffect(Dispatchers.Main) {
         launch {
             scope.launch {
                 viewModel.getEmail()
@@ -220,6 +230,9 @@ fun InfoAccount(viewModel: DataStoreViewModel = hiltViewModel()) {
                             modifier = Modifier.fillMaxWidth(),
                             value = name,
                             onValueChange = { name = it },
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Text,
+                            ),
                             label = {
                                 Text(text = "your name")
                             },
@@ -230,40 +243,37 @@ fun InfoAccount(viewModel: DataStoreViewModel = hiltViewModel()) {
                             modifier = Modifier.fillMaxWidth(),
                             value = pasword,
                             onValueChange = { pasword = it },
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Password,
+                            ),
                             label = {
-                                Text(text = "your pasword")
+                                Text(text = "your password")
                             },
-                            isError = isError,
-                            supportingText = {
-                                if (isError)
-                                    Text(text = "Your password is not the same as repeating it")
-                            }
-                        )
+                            )
                         Spacer(modifier = Modifier.height(3.dp))
                         OutlinedTextField(
                             modifier = Modifier.fillMaxWidth(),
                             value = pasword2,
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Password,
+                            ),
                             onValueChange = { pasword2 = it },
                             label = {
                                 Text(text = "Repeat password")
                             },
-                            isError = isError,
-                            supportingText = {
-                                if (isError)
-                                    Text(text = "Your password is not the same as repeating it")
-                            }
                         )
                         Spacer(modifier = Modifier.height(2.dp))
                         Button(
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color.Black,
+                                contentColor = Color.White
+                            ),
                             enabled = pasword == pasword2,
                             modifier = Modifier.fillMaxWidth(),
                             onClick = {
-                                isError = pasword != pasword2
-                                if (!isError) {
-                                    save = true
-                                    refresh.value=true
-                                    showDialog.value = false
-                                }
+                                viewModel.saveName(name)
+                                viewModel.savePassword(pasword)
+                                showDialog.value = false
                             },
                             shape = RoundedCornerShape(9.dp)
                         ) {
@@ -275,29 +285,21 @@ fun InfoAccount(viewModel: DataStoreViewModel = hiltViewModel()) {
 
             }
         }
-        save = false
-        refresh.value=false
     }
 }
 
-
-var refresh = mutableStateOf(false)
+var name =  mutableStateOf("")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Account(viewModel: DataStoreViewModel = hiltViewModel()) {
-    var name by remember {
-        mutableStateOf("")
-    }
     var email by remember {
         mutableStateOf("بدون ایمیل ")
     }
-
-    LaunchedEffect(true) {
+    LaunchedEffect(showDialog.value) {
         launch {
             viewModel.getName()
-            viewModel.getName.collect {
-                name = it
-                Log.e("pasi",it)
+            viewModel.getName.collectLatest {
+                name.value = it
             }
         }
         launch {
@@ -307,47 +309,58 @@ fun Account(viewModel: DataStoreViewModel = hiltViewModel()) {
             }
         }
     }
-
-    Card(
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        onClick = {
-            showDialog.value = true
-        },
-        modifier = Modifier
-            .fillMaxWidth(),
-        shape = RoundedCornerShape(0.5.dp)
+    Column(
+        modifier = Modifier.fillMaxWidth()
     ) {
-        Row(
+        Card(
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+            onClick = {
+                showDialog.value = true
+            },
             modifier = Modifier
-                .padding(horizontal = 10.dp, vertical = 17.dp)
-                .fillMaxWidth()
-                .padding(horizontal = 5.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+                .fillMaxWidth(),
+            shape = RoundedCornerShape(0.5.dp)
         ) {
             Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start
+                modifier = Modifier
+                    .padding(horizontal = 10.dp, vertical = 17.dp)
+                    .fillMaxWidth()
+                    .padding(horizontal = 5.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.avatar), contentDescription = "",
-                    Modifier
-                        .size(90.dp)
-                        .clip(CircleShape)
-                )
-                Spacer(modifier = Modifier.width(6.dp))
-                Column(
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start
                 ) {
-                    Text(text = name)
-                    Text(text = email, fontSize = 10.sp)
+                    Image(
+                        painter = painterResource(id = R.drawable.avatar), contentDescription = "",
+                        Modifier
+                            .size(90.dp)
+                            .clip(CircleShape)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Column(
+                    ) {
+                        Text(text = name.value)
+                        Text(text = email, fontSize = 10.sp)
+                    }
                 }
-            }
-            Icon(
-                Icons.Rounded.KeyboardArrowRight,
-                contentDescription = ""
-            )
+                Icon(
+                    Icons.Rounded.KeyboardArrowRight,
+                    contentDescription = ""
+                )
 
+            }
         }
+        Divider(
+            modifier = Modifier
+                .fillMaxWidth()
+                .alpha(0.18f),
+            thickness = 5.dp,
+            color = Color.DarkGray
+        )
     }
+
 }
 

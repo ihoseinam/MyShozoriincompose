@@ -1,7 +1,9 @@
 package ir.hoseinahmadi.myshop.Screen
 
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,13 +13,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AccountCircle
+import androidx.compose.material.icons.rounded.AddCircle
+import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -52,6 +59,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import ir.hoseinahmadi.myshop.Db.CartItem
+import ir.hoseinahmadi.myshop.Db.CartViewModel
 import ir.hoseinahmadi.myshop.Navigation.Screen
 import ir.hoseinahmadi.myshop.Remote.Data.ProductItem
 import ir.hoseinahmadi.myshop.ViewModel.DataStoreViewModel
@@ -64,7 +73,9 @@ import kotlinx.coroutines.launch
 fun HomeScreen(
     navHostController: NavHostController,
     viewModel: MainApiViewModel = hiltViewModel(),
+    cartViewModel: CartViewModel = hiltViewModel()
 ) {
+
     var loadin by remember {
         mutableStateOf(true)
     }
@@ -78,22 +89,11 @@ fun HomeScreen(
             }
         }
     }
-    Scaffold(
-        topBar = {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                IconButton(onClick = { navHostController.navigate(Screen.Profile.route) }) {
-                    Icon(Icons.Rounded.AccountCircle, contentDescription = "")
-                }
-            }
-        }
-    ) {
+    Scaffold {
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .background(Color(0xFFF5F4F2))
                 .padding(it),
             contentAlignment = TopCenter
         ) {
@@ -126,26 +126,34 @@ fun Category(navHostController: NavHostController) {
             "Men's",
             "Women's",
         )
-        Row {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 5.dp, vertical = 4.dp)
+                .horizontalScroll(rememberScrollState())
+        ) {
             item.forEachIndexed { index, item ->
                 TextButton(
+                    modifier = Modifier
+                        .padding(4.dp),
                     onClick = { selectedIndex = index },
-                    shape = RoundedCornerShape(12.dp),
+                    shape = RoundedCornerShape(18.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = if (selectedIndex == index)
-                            Color(0xFFFF9800)
+                            Color.Black
                         else
+                            Color.White,
+                        contentColor = if (selectedIndex == index)
                             Color.White
-                    )
+                        else
+                            Color.Black,
+                    ),
                 ) {
                     Text(
+                        modifier = Modifier.padding(horizontal = 5.dp, vertical = 3.dp),
                         text = item,
-                        color = if (selectedIndex == index)
-                            Color.White
-                        else
-                            Color.DarkGray
 
-                    )
+                        )
                 }
             }
 
@@ -184,7 +192,21 @@ fun Category(navHostController: NavHostController) {
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
 @Composable
-fun ItemProduct(navHostController: NavHostController, data: ProductItem) {
+fun ItemProduct(
+    navHostController: NavHostController,
+    data: ProductItem,
+    cartViewModel: CartViewModel = hiltViewModel()
+) {
+    var check by remember {
+        mutableStateOf(false)
+    }
+    LaunchedEffect(true) {
+        launch {
+            cartViewModel.checkProduct(data.id.toString()).collectLatest {
+                check =it
+            }
+        }
+    }
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White),
         onClick = {
@@ -202,10 +224,12 @@ fun ItemProduct(navHostController: NavHostController, data: ProductItem) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(6.dp),
+                    .padding(4.dp),
                 contentAlignment = Alignment.TopCenter
             ) {
-                Column {
+                Column(
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                ) {
                     GlideImage(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -214,10 +238,43 @@ fun ItemProduct(navHostController: NavHostController, data: ProductItem) {
                         contentDescription = "",
                     )
                     Spacer(modifier = Modifier.height(10.dp))
-                    Text(text = data.title.substring(0, 16))
-                    Text(
-                        text = "${data.price} $",
-                    )
+                    Text(text = data.title.substring(0, 17))
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            ,
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "${data.price} $",
+                            fontSize = 14.sp
+                        )
+                        AnimatedVisibility(check) {
+                            IconButton(onClick = { /*TODO*/ }) {
+                                Icon(Icons.Rounded.CheckCircle, contentDescription ="" )
+                            }
+                        }
+                          AnimatedVisibility(!check) {
+                              IconButton(onClick = {
+                                  cartViewModel.insertCartItem(
+                                      CartItem(
+                                          data.id.toString(),
+                                          data.title,
+                                          data.price,
+                                          data.image,
+                                          1,
+                                          data.category,
+                                          data.rating.rate
+                                      ))
+                              }) {
+                                  Icon(Icons.Rounded.AddCircle,
+                                      contentDescription ="" )
+                              }
+                        }
+
+                    }
+
                 }
 
             }

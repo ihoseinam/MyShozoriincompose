@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.material.icons.rounded.ArrowBack
@@ -40,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -151,6 +153,9 @@ fun SendCode(viewModel: VerifyApiUserViewModel, navHostController: NavHostContro
                             unfocusedLeadingIconColor = Color.DarkGray,
                             focusedIndicatorColor = Color(0x23666464),
                             unfocusedIndicatorColor = Color.Transparent,
+                        ),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Email,
                         ),
                         modifier = Modifier
                             .fillMaxWidth()
@@ -356,6 +361,7 @@ fun VerifyCode(
                             focusedIndicatorColor = Color(0x23666464),
                             unfocusedIndicatorColor = Color.Transparent,
                         ),
+
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 12.dp),
@@ -374,6 +380,9 @@ fun VerifyCode(
                             unfocusedLeadingIconColor = Color.DarkGray,
                             focusedIndicatorColor = Color(0x23666464),
                             unfocusedIndicatorColor = Color.Transparent,
+                        ),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number,
                         ),
                         modifier = Modifier
                             .fillMaxWidth()
