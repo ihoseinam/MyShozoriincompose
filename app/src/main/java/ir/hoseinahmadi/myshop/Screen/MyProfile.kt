@@ -17,6 +17,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.rounded.Send
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.outlined.Build
@@ -32,6 +34,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
@@ -53,15 +56,21 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import ir.hoseinahmadi.myshop.Navigation.Screen
 import ir.hoseinahmadi.myshop.R
 import ir.hoseinahmadi.myshop.ViewModel.DataStoreViewModel
+import ir.hoseinahmadi.myshop.ui.theme.h1
+import ir.hoseinahmadi.myshop.ui.theme.h2
+import ir.hoseinahmadi.myshop.ui.theme.h3
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -71,22 +80,36 @@ import kotlinx.coroutines.launch
 fun MyProfileScreen(navHostController: NavHostController) {
     Scaffold(
         topBar = {
-            TopAppBar(title = { /*TODO*/ }, navigationIcon = {
-                IconButton(onClick = { navHostController.popBackStack() }) {
-                    Icon(Icons.Rounded.ArrowBack, contentDescription ="" )
-                }
-            })
+            TopAppBar(title = {
+                Text(
+                    text = "Profile Screen",
+                    style = h1,
+                    color = Color.Black
+                )
+            },)
         }
     ) {
         Column(
-            modifier = Modifier.fillMaxSize().padding(it),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(it),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Account()
             InfoAccount(navHostController)
-            ProfileItem(onclick = { /*TODO*/ }, text ="My favorites list" , icon = Icons.Rounded.FavoriteBorder)
+            ProfileItem(onclick = {
+                navHostController.navigate(Screen.Fav.route) {
+                    popUpTo(Screen.Profile.route) {
+                        inclusive = true
+                    }
+                }
+            }, text = "My favorites list", icon = Icons.Rounded.FavoriteBorder)
             ProfileItem(onclick = { /*TODO*/ }, text = "Update check", icon = Icons.Outlined.Build)
-            ProfileItem(onclick = { /*TODO*/ }, text ="Message to support" , icon = Icons.Outlined.Email)
+            ProfileItem(
+                onclick = {},
+                text = "Message to support",
+                icon = Icons.Outlined.Email
+            )
 
         }
     }
@@ -95,14 +118,14 @@ fun MyProfileScreen(navHostController: NavHostController) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileItem(onclick: () -> Unit, text: String, icon: ImageVector) {
+fun ProfileItem(onclick: @Composable () -> Unit, text: String, icon: ImageVector) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
     ) {
         Card(
             colors = CardDefaults.cardColors(containerColor = Color.White),
-            onClick = { },
+            onClick = { onclick },
             modifier = Modifier
                 .fillMaxWidth(),
             shape = RoundedCornerShape(0.5.dp)
@@ -120,15 +143,15 @@ fun ProfileItem(onclick: () -> Unit, text: String, icon: ImageVector) {
                 ) {
                     Icon(icon, contentDescription = "")
                     Spacer(modifier = Modifier.width(5.dp))
-                    Text(text = text)
+                    Text(text = text, style = h3, color = Color.Black)
                 }
                 Icon(
-                    Icons.Rounded.KeyboardArrowRight, contentDescription = ""
+                    Icons.AutoMirrored.Rounded.KeyboardArrowRight, contentDescription = ""
                 )
 
             }
         }
-        Divider(
+        HorizontalDivider(
             modifier = Modifier
                 .fillMaxWidth()
                 .alpha(0.4f)
@@ -218,15 +241,17 @@ fun InfoAccount(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         OutlinedTextField(
+                            textStyle = h3,
                             modifier = Modifier.fillMaxWidth(),
                             value = email,
                             onValueChange = { },
                             readOnly = true,
                             label = {
-                                Text(text = "your email")
+                                Text(text = "your email", style = h3)
                             },
                         )
                         OutlinedTextField(
+                            textStyle = h3,
                             modifier = Modifier.fillMaxWidth(),
                             value = name,
                             onValueChange = { name = it },
@@ -234,12 +259,13 @@ fun InfoAccount(
                                 keyboardType = KeyboardType.Text,
                             ),
                             label = {
-                                Text(text = "your name")
+                                Text(text = "your name",style = h3)
                             },
                         )
 
                         Spacer(modifier = Modifier.height(2.dp))
                         OutlinedTextField(
+                            textStyle = h3,
                             modifier = Modifier.fillMaxWidth(),
                             value = pasword,
                             onValueChange = { pasword = it },
@@ -247,11 +273,12 @@ fun InfoAccount(
                                 keyboardType = KeyboardType.Password,
                             ),
                             label = {
-                                Text(text = "your password")
+                                Text(text = "your password",style = h3)
                             },
-                            )
+                        )
                         Spacer(modifier = Modifier.height(3.dp))
                         OutlinedTextField(
+                            textStyle = h3,
                             modifier = Modifier.fillMaxWidth(),
                             value = pasword2,
                             keyboardOptions = KeyboardOptions(
@@ -259,7 +286,7 @@ fun InfoAccount(
                             ),
                             onValueChange = { pasword2 = it },
                             label = {
-                                Text(text = "Repeat password")
+                                Text(text = "Repeat password",style = h3)
                             },
                         )
                         Spacer(modifier = Modifier.height(2.dp))
@@ -277,7 +304,7 @@ fun InfoAccount(
                             },
                             shape = RoundedCornerShape(9.dp)
                         ) {
-                            Text(text = "save")
+                            Text(text = "save",style = h3)
                         }
                     }
 
@@ -288,7 +315,8 @@ fun InfoAccount(
     }
 }
 
-var name =  mutableStateOf("")
+var name = mutableStateOf("")
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Account(viewModel: DataStoreViewModel = hiltViewModel()) {
@@ -340,14 +368,15 @@ fun Account(viewModel: DataStoreViewModel = hiltViewModel()) {
                             .clip(CircleShape)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
-                    Column(
-                    ) {
-                        Text(text = name.value)
-                        Text(text = email, fontSize = 10.sp)
+                    Column {
+                        Text(text = name.value.trim(),
+                            style = h2, color = Color.Black)
+                        Spacer(modifier = Modifier.height(3.dp))
+                        Text(text = email, fontSize = 10.sp, style = h3, color = Color.DarkGray)
                     }
                 }
                 Icon(
-                    Icons.Rounded.KeyboardArrowRight,
+                    Icons.AutoMirrored.Rounded.KeyboardArrowRight,
                     contentDescription = ""
                 )
 

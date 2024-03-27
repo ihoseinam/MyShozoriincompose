@@ -37,6 +37,7 @@ fun NavGraph(navHostController: NavHostController) {
             arguments = listOf(
                 navArgument("id"){
                     type = NavType.StringType
+                    defaultValue ="2"
                 }
             )
             ) {

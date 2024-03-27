@@ -1,9 +1,8 @@
-package ir.hoseinahmadi.myshop.Db
+package ir.hoseinahmadi.myshop.Db.ShopingCart
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import ir.hoseinahmadi.myshop.Remote.Data.ProductItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
@@ -41,6 +40,8 @@ class CartViewModel @Inject constructor(
         }
 
     }
+
+    fun getProductById(itemId: String) :Flow<CartItem> = repository.getProductById(itemId)
 
 
 }

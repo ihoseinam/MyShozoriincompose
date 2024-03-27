@@ -10,6 +10,8 @@ class FaveRepository @Inject constructor(
 
     val allFaveItem: Flow<List<FaveItem>> = dao.allFaveItem()
 
+    val faveCount :Flow<Int> = dao.getFaveCount()
+
     fun insertFaveItem(item: FaveItem) = dao.insertItem(item)
 
     fun deleteItem(item: FaveItem) = dao.deleteItem(item)

@@ -1,6 +1,5 @@
 package ir.hoseinahmadi.myshop.Screen
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
@@ -13,31 +12,24 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.material.icons.rounded.AddCircle
 import androidx.compose.material.icons.rounded.CheckCircle
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -50,30 +42,31 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.TopCenter
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-import ir.hoseinahmadi.myshop.Db.CartItem
-import ir.hoseinahmadi.myshop.Db.CartViewModel
+import ir.hoseinahmadi.myshop.Db.ShopingCart.CartItem
+import ir.hoseinahmadi.myshop.Db.ShopingCart.CartViewModel
 import ir.hoseinahmadi.myshop.Navigation.Screen
 import ir.hoseinahmadi.myshop.Remote.Data.ProductItem
-import ir.hoseinahmadi.myshop.ViewModel.DataStoreViewModel
 import ir.hoseinahmadi.myshop.ViewModel.MainApiViewModel
 import ir.hoseinahmadi.myshop.component.Loading3Dots
+import ir.hoseinahmadi.myshop.ui.theme.h1
+import ir.hoseinahmadi.myshop.ui.theme.h2
+import ir.hoseinahmadi.myshop.ui.theme.h3
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     navHostController: NavHostController,
     viewModel: MainApiViewModel = hiltViewModel(),
-    cartViewModel: CartViewModel = hiltViewModel()
 ) {
 
     var loadin by remember {
@@ -89,7 +82,14 @@ fun HomeScreen(
             }
         }
     }
-    Scaffold {
+    Scaffold(
+        topBar = {
+            TopAppBar(title = {
+                Text(text = "Hosein Shop", style = h1)
+            })
+
+        }
+    ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -134,6 +134,7 @@ fun Category(navHostController: NavHostController) {
         ) {
             item.forEachIndexed { index, item ->
                 TextButton(
+
                     modifier = Modifier
                         .padding(4.dp),
                     onClick = { selectedIndex = index },
@@ -152,30 +153,11 @@ fun Category(navHostController: NavHostController) {
                     Text(
                         modifier = Modifier.padding(horizontal = 5.dp, vertical = 3.dp),
                         text = item,
-
-                        )
+                        style = h3
+                    )
                 }
             }
 
-            /*    Tab(
-                    modifier = Modifier
-                        .padding(3.dp)
-                        .clip(CircleShape)
-                        .background(
-                            if (selectedIndex == index)
-                                Color.Green
-                            else
-                                Color.White
-                        ),
-                    selected = selectedIndex == index,
-                    onClick = { selectedIndex = index },
-                    text = {
-                        Text(
-                            text = item,
-                            fontSize = 9.sp
-                        )
-                    }
-                )*/
         }
 
 
@@ -203,7 +185,7 @@ fun ItemProduct(
     LaunchedEffect(true) {
         launch {
             cartViewModel.checkProduct(data.id.toString()).collectLatest {
-                check =it
+                check = it
             }
         }
     }
@@ -238,39 +220,47 @@ fun ItemProduct(
                         contentDescription = "",
                     )
                     Spacer(modifier = Modifier.height(10.dp))
-                    Text(text = data.title.substring(0, 17))
+                    Text(text = data.title, style = h2,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                    )
                     Row(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            ,
+                            .fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
                             text = "${data.price} $",
-                            fontSize = 14.sp
+                            fontSize = 17.sp,
+                            style = h3
                         )
-                        AnimatedVisibility(check) {
-                            IconButton(onClick = { /*TODO*/ }) {
-                                Icon(Icons.Rounded.CheckCircle, contentDescription ="" )
+                        IconButton(onClick = { /*TODO*/ }) {
+                            AnimatedVisibility(check) {
+                                Icon(Icons.Rounded.CheckCircle, contentDescription = "")
                             }
-                        }
-                          AnimatedVisibility(!check) {
-                              IconButton(onClick = {
-                                  cartViewModel.insertCartItem(
-                                      CartItem(
-                                          data.id.toString(),
-                                          data.title,
-                                          data.price,
-                                          data.image,
-                                          1,
-                                          data.category,
-                                          data.rating.rate
-                                      ))
-                              }) {
-                                  Icon(Icons.Rounded.AddCircle,
-                                      contentDescription ="" )
-                              }
+                            AnimatedVisibility(!check) {
+                                IconButton(onClick = {
+                                    cartViewModel.insertCartItem(
+                                        CartItem(
+                                            data.id.toString(),
+                                            data.title,
+                                            data.price,
+                                            data.image,
+                                            1,
+                                            data.category,
+                                            data.rating.rate
+                                        )
+                                    )
+                                }) {
+                                    Icon(
+                                        Icons.Rounded.AddCircle,
+                                        contentDescription = ""
+                                    )
+                                }
+                            }
+
+
                         }
 
                     }

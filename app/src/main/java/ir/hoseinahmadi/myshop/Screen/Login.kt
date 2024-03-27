@@ -3,6 +3,7 @@ package ir.hoseinahmadi.myshop.Screen
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,12 +17,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Email
 import androidx.compose.material.icons.rounded.KeyboardArrowLeft
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -29,6 +32,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -52,6 +57,9 @@ import ir.hoseinahmadi.myshop.R
 import ir.hoseinahmadi.myshop.ViewModel.DataStoreViewModel
 import ir.hoseinahmadi.myshop.ViewModel.VerifyApiUserViewModel
 import ir.hoseinahmadi.myshop.component.Loading3Dots
+import ir.hoseinahmadi.myshop.ui.theme.h1
+import ir.hoseinahmadi.myshop.ui.theme.h2
+import ir.hoseinahmadi.myshop.ui.theme.h3
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -75,6 +83,7 @@ fun LoginScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SendCode(viewModel: VerifyApiUserViewModel, navHostController: NavHostController) {
     val scop = rememberCoroutineScope()
@@ -121,22 +130,20 @@ fun SendCode(viewModel: VerifyApiUserViewModel, navHostController: NavHostContro
     }
     Scaffold(
         topBar = {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(onClick = { navHostController.popBackStack() }) {
-                    Icon(
-                        Icons.Rounded.ArrowBack,
-                        contentDescription = "",
-                    )
-                }
-            }
+            TopAppBar(
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.White
+                ),
+                title = {
+                Text(text = "Login or Register", style = h1, color = Color.Black)
+            })
+
         }
     ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .background(Color(0xFFF5F4F2))
                 .padding(it)
         ) {
             Box(
@@ -147,6 +154,7 @@ fun SendCode(viewModel: VerifyApiUserViewModel, navHostController: NavHostContro
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     OutlinedTextField(
+                        textStyle = h3,
                         shape = RoundedCornerShape(8.dp),
                         colors = TextFieldDefaults.colors(
                             focusedLeadingIconColor = Color.Black,
@@ -205,8 +213,8 @@ fun SendCode(viewModel: VerifyApiUserViewModel, navHostController: NavHostContro
                         }
                         AnimatedVisibility(!loading) {
                             Text(
+                                style = h2,
                                 text = "Send verification code",
-                                fontSize = 14.sp,
                                 color = Color.White
                             )
                         }
@@ -222,16 +230,18 @@ fun SendCode(viewModel: VerifyApiUserViewModel, navHostController: NavHostContro
                         .fillMaxWidth()
                         .padding(horizontal = 8.dp),
                 ) {
-                    Spacer(modifier = Modifier.height(40.dp))
+                    Spacer(modifier = Modifier.height(60.dp))
                     Text(
+                        style = h1,
                         text = "Hello !",
-                        fontSize = 30.sp,
+                        color = Color.Black,
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
+                        style = h2,
                         text = "Welcome, Please enter your email address to register or log in to your account",
-                        fontSize = 17.sp,
+                        color = Color.Black
                     )
 
                 }
@@ -300,7 +310,7 @@ fun VerifyCode(
             ) {
                 IconButton(onClick = { checkSend.value = false }) {
                     Icon(
-                        Icons.Rounded.ArrowBack,
+                        Icons.AutoMirrored.Rounded.ArrowBack,
                         contentDescription = "",
                     )
                 }
@@ -310,6 +320,7 @@ fun VerifyCode(
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .background(Color(0xFFF5F4F2))
                 .padding(it)
         ) {
             Box(
@@ -328,8 +339,8 @@ fun VerifyCode(
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center,
                         text = "Enter the verification code",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 27.sp
+                        color = Color.Black,
+                        style = h1
                     )
                     Spacer(modifier = Modifier.height(7.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -340,7 +351,8 @@ fun VerifyCode(
                         Spacer(modifier = Modifier.width(5.dp))
                         Text(
                             text = "The verification code has been sent to your email",
-                            fontSize = 14.sp
+                            color = Color.DarkGray,
+                            style = h2
                         )
                     }
 
@@ -354,6 +366,7 @@ fun VerifyCode(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     OutlinedTextField(
+                        textStyle = h3,
                         shape = RoundedCornerShape(8.dp),
                         colors = TextFieldDefaults.colors(
                             focusedLeadingIconColor = Color.Black,
@@ -374,6 +387,7 @@ fun VerifyCode(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     OutlinedTextField(
+                        textStyle = h3,
                         shape = RoundedCornerShape(8.dp),
                         colors = TextFieldDefaults.colors(
                             focusedLeadingIconColor = Color.Black,
@@ -393,7 +407,7 @@ fun VerifyCode(
                         isError = isError,
                         supportingText = {
                             if (isError) {
-                                Text(text = "Enter the verification code correctly")
+                                Text(text = "Enter the verification code correctly", style = h3)
                             }
                         },
                         placeholder = {
@@ -425,7 +439,7 @@ fun VerifyCode(
                             Loading3Dots(isDark = false)
                         }
                         AnimatedVisibility(visible = !loading) {
-                            Text(text = "Confirm")
+                            Text(text = "Confirm", style = h2)
                         }
 
                     }
@@ -442,8 +456,8 @@ fun VerifyCode(
                         viewModel2.saveCheckLogin(true)
                     }
                 }
-                navHostController.navigate(Screen.Home.route) {
-                    popUpTo(Screen.Login.route) {
+                navHostController.navigate(Screen.Profile.route) {
+                    popUpTo(Screen.Profile.route) {
                         inclusive = true
                     }
                 }

@@ -14,6 +14,7 @@ class FaveViewModel @Inject constructor(
 ) : ViewModel() {
 
     val allFaveItem :Flow<List<FaveItem>> =repository.allFaveItem
+    val faveCount :Flow<Int> =repository.faveCount
 
     fun addNewFaveItem(item: FaveItem) {
         viewModelScope.launch(Dispatchers.IO) {

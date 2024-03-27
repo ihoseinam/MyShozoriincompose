@@ -1,4 +1,4 @@
-package ir.hoseinahmadi.myshop.Db
+package ir.hoseinahmadi.myshop.Db.ShopingCart
 
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -18,7 +18,8 @@ class CartRepository @Inject constructor(
         dao.InsertCartItem(cartItem)
     }
 
-    suspend fun removeFromCart(cartItem: CartItem) {
+     fun getProductById(itemId: String):Flow<CartItem> = dao.getProductBYId(itemId)
+     fun removeFromCart(cartItem: CartItem) {
         dao.removeFromCart(cartItem)
     }
 

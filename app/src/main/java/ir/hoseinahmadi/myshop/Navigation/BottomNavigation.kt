@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.ShoppingCart
@@ -30,17 +29,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import ir.hoseinahmadi.myshop.Db.CartViewModel
+import ir.hoseinahmadi.myshop.Db.Fave.FaveViewModel
+import ir.hoseinahmadi.myshop.Db.ShopingCart.CartViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BottomNavigation(
     navHostController: NavHostController,
     onItemClick: (NavigationItem) -> Unit,
-    cartViewModel: CartViewModel= hiltViewModel()
+    cartViewModel: CartViewModel = hiltViewModel(),
+    faveViewModel: FaveViewModel= hiltViewModel()
 ) {
     val item = listOf(
         NavigationItem(
@@ -50,18 +50,17 @@ fun BottomNavigation(
             unselectedIcon = Icons.Outlined.Home,
         ),
         NavigationItem(
-            name = "Fav",
+            name = "Favorite",
             route = Screen.Fav.route,
             selectedIcon = Icons.Rounded.Favorite,
             unselectedIcon = Icons.Rounded.FavoriteBorder,
         ),
         NavigationItem(
-            name = "Shoping",
+            name = "Shopping",
             route = Screen.ShopingCard.route,
             selectedIcon = Icons.Rounded.ShoppingCart,
             unselectedIcon = Icons.Outlined.ShoppingCart,
         ),
-
            NavigationItem(
             name = "Profile",
             route = Screen.Profile.route,
@@ -76,6 +75,7 @@ fun BottomNavigation(
     val showBottomBar = backStackEntry.value?.destination?.route in item.map { it.route }
 
     val cartCount by cartViewModel.productCountFlow.collectAsState(initial = 0)
+    val faveCount by faveViewModel.faveCount.collectAsState(initial = 0)
     if (showBottomBar) {
         NavigationBar(
             modifier = Modifier
@@ -99,6 +99,17 @@ fun BottomNavigation(
                                     ) {
                                         Text(
                                             text = cartCount.toString(),
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    }
+                                }
+                                if (index==1 && faveCount > 0){
+                                    Badge(
+                                        contentColor = Color.White,
+                                        containerColor = Color.Red,
+                                    ) {
+                                        Text(
+                                            text = faveCount.toString(),
                                             fontWeight = FontWeight.Bold
                                         )
                                     }

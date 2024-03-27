@@ -7,7 +7,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import ir.hoseinahmadi.myshop.Db.CartDao
+import ir.hoseinahmadi.myshop.Db.Fave.FaveDao
+import ir.hoseinahmadi.myshop.Db.ShopingCart.CartDao
 import ir.hoseinahmadi.myshop.Db.MyShopDataBase
 import ir.hoseinahmadi.myshop.component.Constants.DATABASE_NAME
 import javax.inject.Singleton
@@ -30,6 +31,9 @@ object DataBaseModule {
 
     @Singleton
     @Provides
-    fun provideCartDao(dataBase: MyShopDataBase):CartDao=dataBase.CartDao()
+    fun provideCartDao(dataBase: MyShopDataBase): CartDao = dataBase.CartDao()
 
+    @Singleton
+    @Provides
+    fun provideFaveDao(dataBase: MyShopDataBase): FaveDao = dataBase.FaveDao()
 }

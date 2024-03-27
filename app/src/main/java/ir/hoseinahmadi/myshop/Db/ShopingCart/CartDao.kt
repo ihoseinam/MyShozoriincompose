@@ -1,4 +1,4 @@
-package ir.hoseinahmadi.myshop.Db
+package ir.hoseinahmadi.myshop.Db.ShopingCart
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -16,13 +16,13 @@ interface CartDao {
     suspend fun InsertCartItem(cartItem: CartItem)
 
     @Query("SELECT * FROM shoping_cart")
-     fun getAllItemCart():Flow<List<CartItem>>
+    fun getAllItemCart(): Flow<List<CartItem>>
 
-     @Delete
-     fun removeFromCart(item: CartItem)
+    @Delete
+    fun removeFromCart(item: CartItem)
 
-     @Query("UPDATE shoping_cart SET count=:newCount WHERE itemId=:id")
-     suspend fun changeCountCartItem(id:String,newCount:Int)
+    @Query("UPDATE shoping_cart SET count=:newCount WHERE itemId=:id")
+    suspend fun changeCountCartItem(id: String, newCount: Int)
 
     @Query("SELECT SUM(price * count) FROM shoping_cart")
     fun getTotalPrice(): Flow<Double>
@@ -33,5 +33,7 @@ interface CartDao {
     @Query("SELECT EXISTS(SELECT * FROM SHOPING_CART WHERE itemId =:itemId)")
     fun isShopItemExist(itemId: String): Flow<Boolean>
 
+    @Query("SELECT * FROM SHOPING_CART WHERE itemId=:itemId")
+     fun getProductBYId(itemId: String): Flow<CartItem>
 
 }

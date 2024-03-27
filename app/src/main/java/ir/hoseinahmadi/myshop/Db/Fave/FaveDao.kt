@@ -25,5 +25,4 @@ interface FaveDao {
     @Query("SELECT COUNT(*) FROM Fave_TABLE")
     fun getFaveCount(): Flow<Int>
 
-
 }

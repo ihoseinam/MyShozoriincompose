@@ -30,19 +30,19 @@ class DataStoreViewModel @Inject constructor(
 
     fun saveName(name: String) {
         viewModelScope.launch() {
-            repository.putString(nameKey, name)
+            repository.putString(nameKey, name.trim())
         }
     }
 
     fun savePassword(password: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.putString(UserPas, password)
+            repository.putString(UserPas, password.trim())
         }
     }
 
     fun saveEmail(email: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.putString(emailKey, email)
+            repository.putString(emailKey, email.trim())
         }
     }
 

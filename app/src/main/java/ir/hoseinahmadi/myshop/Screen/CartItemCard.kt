@@ -1,15 +1,14 @@
 package ir.hoseinahmadi.myshop.Screen
 
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
@@ -19,19 +18,16 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -40,8 +36,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-import ir.hoseinahmadi.myshop.Db.CartItem
-import ir.hoseinahmadi.myshop.Db.CartViewModel
+import ir.hoseinahmadi.myshop.Db.ShopingCart.CartItem
+import ir.hoseinahmadi.myshop.Db.ShopingCart.CartViewModel
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalGlideComposeApi::class)
@@ -67,7 +63,7 @@ fun CartItemCard(
             Column(
                 modifier = Modifier
                     .weight(0.5f)
-                    .padding(vertical = 10.dp)
+                    .padding(vertical = 10.dp, horizontal = 5.dp)
                     .fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
@@ -75,7 +71,7 @@ fun CartItemCard(
                 GlideImage(
                     modifier = Modifier
                         .align(Alignment.Start)
-                        .fillMaxWidth()
+                        .fillMaxWidth(.9f)
                         .height(170.dp),
                     model = item.img,
                     contentDescription = "",
@@ -89,64 +85,87 @@ fun CartItemCard(
                     .fillMaxWidth()
             ) {
                 Spacer(modifier = Modifier.height(15.dp))
-                Text(text = item.title)
-                Spacer(modifier = Modifier.height(10.dp))
-                Text(text = " Category: ${item.category}")
-                Spacer(modifier = Modifier.height(5.dp))
-                Text(text =" Price: ${(item.price * count).roundToInt()} $",
+                Text(text = item.title,)
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(text = " Category: ${item.category}",
+                    color = Color.DarkGray
+                    )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = " Price: ${(item.price * count).roundToInt()} $",
                     fontSize = 16.sp,
                     color = Color.Red
                 )
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(40.dp))
                 Row(
                     modifier = Modifier
-                        .fillMaxWidth(0.7f)
+                        .fillMaxWidth(0.8f)
+                        .padding(9.dp)
                 ) {
                     Surface(
                         color = Color.White,
                         modifier = Modifier
                             .clip(RoundedCornerShape(6.dp))
-                            .border(1.5.dp, Color.LightGray.copy(0.9f), RoundedCornerShape(6.dp))
+                            .border(
+                                1.5.dp, Color.LightGray.copy(0.9f),
+                                RoundedCornerShape(6.dp)
+                            )
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceAround,
-                            modifier = Modifier.fillMaxWidth().padding(
-                                horizontal = 15.dp,
-                                vertical = 6.dp
-                            ),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp)
                         ) {
                             if (count == 1) {
-                                Icon(
-                                    Icons.Rounded.Delete,
-                                    contentDescription = "",
-                                    Modifier.clickable {
+                                IconButton(
+                                    modifier = Modifier.size(25.dp),
+                                    colors = IconButtonDefaults.iconButtonColors(contentColor = Color.Red),
+                                    onClick = {
                                         cartViewModel.removeCartItem(item)
-                                    }
-                                )
+                                    }) {
+                                    Icon(
+                                        Icons.Rounded.Delete,
+                                        contentDescription = "",
+                                    )
+                                }
+
                             } else {
-                                Icon(
-                                    Icons.Rounded.Clear,
-                                    contentDescription = "",
-                                    Modifier.clickable {
+                                IconButton(
+                                    modifier = Modifier.size(25.dp),
+                                    colors = IconButtonDefaults.iconButtonColors(contentColor = Color.Red),
+                                    onClick = {
                                         count--
                                         cartViewModel.changeCartItemCount(item.itemId, count)
-                                    }
-                                )
+                                    }) {
+                                    Text(text = "---",
+                                        fontSize = 19.sp,
+                                        fontWeight = FontWeight.Bold
+                                        )
+                                }
                             }
                             Text(
                                 text = count.toString(),
-                                modifier = Modifier.padding(horizontal = 5.dp)
+                                modifier = Modifier.padding(horizontal = 2.dp),
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.Red
                             )
-
-                            Icon(
-                                Icons.Rounded.Add,
-                                contentDescription = "",
-                                Modifier.clickable {
+                            IconButton(
+                                modifier = Modifier.size(25.dp),
+                                colors = IconButtonDefaults.iconButtonColors(contentColor = Color.Red),
+                                onClick = {
                                     count++
                                     cartViewModel.changeCartItemCount(item.itemId, count)
-                                }
-                            )
+                                }) {
+                                Icon(
+                                    Icons.Rounded.Add,
+                                    contentDescription = "",
+
+                                    )
+                            }
+
                         }
 
                     }
@@ -159,4 +178,5 @@ fun CartItemCard(
     }
 
 }
+
 

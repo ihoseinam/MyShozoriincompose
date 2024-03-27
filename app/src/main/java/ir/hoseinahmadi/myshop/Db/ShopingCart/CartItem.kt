@@ -1,4 +1,4 @@
-package ir.hoseinahmadi.myshop.Db
+package ir.hoseinahmadi.myshop.Db.ShopingCart
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -8,7 +8,7 @@ import ir.hoseinahmadi.myshop.component.Constants.SHOPING_CART_TABLE
 
 @Entity(tableName = SHOPING_CART_TABLE)
 data class CartItem(
-    @PrimaryKey()
+    @PrimaryKey
     val itemId: String,
     val title: String,
     val price:Double,
